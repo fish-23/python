@@ -1,0 +1,22 @@
+﻿<html>
+<form action="/api/register_mail_ver" method="post">
+<fieldset>
+   <legend> <h1>用户注册 </h1></legend>
+<table>
+<tr>
+  <td>
+  <label> 验证码: </label>
+  <input type="text" name="mail_num" value=""/>
+  <input type="submit" value="确定"/>
+  </td>
+</tr>
+<tr>
+  <td>
+  <a href="/register"><h4>重新输入邮箱</h4></a>
+  <a href="/resend"><h4>重新发送验证码</h4></a>
+  <h4>备注：验证码发送有延迟，两分钟后未收到邮件，再进行选择</h4>
+  </td>
+</tr>
+</table>
+</form>
+</html>
