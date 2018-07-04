@@ -1,0 +1,41 @@
+﻿1，设置mysql配置文件，将数据库默认编码转化为utf8
+     vim /etc/my.cnf
+    
+     [client]
+     default-character-set = utf8
+     [mysqld]
+     default-storage-engine = INNODB
+     character-set-server = utf8
+     collation-server = utf8_general_ci
+ 
+     重启 systemctl restart mariadb
+     登陆mysql后， show variables like '%char%'  查看mysql的编码情况
+
+
+2，安装支持Python的MySQL驱动
+     pip install mysql-connector
+     
+
+3，演示：连接到MySQL服务器的test数据库
+     # 导入MySQL驱动 
+     import mysql.connector
+     # 连接数据库
+     conn = mysql.connector.connect(user='root', password='password', database='test')
+     # 连接到数据库后，需要打开游标，称之为Cursor，通过Cursor执行SQL语句，然后，获得执行结果
+     cursor = conn.cursor()
+
+     # 创建user表:
+     cursor.execute('create table user (id varchar(20) primary key, name varchar(20))')
+     # 插入一行记录，注意MySQL的占位符是%s:
+     cursor.execute('insert into user (id, name) values (%s, %s)', ['1', 'Michael'])
+     print(cursor.rowcount)   # 获得插入的行数
+     conn.commit()     #  执行insert等操作后要调用commit()提交事务
+     cursor.close()       #  关闭游标
+
+     # 查询:
+     cursor = conn.cursor()
+     cursor.execute('select * from user where id = %s', ('1',))
+     values = cursor.fetchall()    # 获得查询结果集
+     print(values)
+     cursor.close()
+     conn.close()   # 关闭连接
