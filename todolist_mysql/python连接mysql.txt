@@ -39,3 +39,81 @@
      print(values)
      cursor.close()
      conn.close()   # 关闭连接
+
+
+4，增删改查
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+from bottle import route, run, static_file
+from bottle import request
+import time
+import mysql.connector
+
+page='''
+<html>
+<form action="/add" method="post">
+name <input type="text" name="name" vlaue=""/>
+todo <input type="text" name="todo" value=""/>
+<input type="submit" value="提交"/>
+</form>
+</html>
+'''
+conn = mysql.connector.connect(user='root', password='root', database='wlp')
+cursor = conn.cursor()
+
+@route('/todo')
+def todo():
+        return page
+
+def m_add(name, todo):
+        #cursor.execute('create table todo(id int primary key auto_increment, name varchar(20), todo varchar(20))')
+        # 插入单条数据
+        # cursor.execute('insert into todo values(%s,%s,%s)', [0,name,todo])
+        sqlin="insert into todo values(%s,%s,%s)"
+        cursor.execute(sqlin, (0,name,todo))
+        # 增加数据这块只能用%s，用%d会出错
+        # 插入多条
+        cursor.executemany(sqlin,[(0,name,todo),(0,name,todo)])
+        conn.commit()
+        print(cursor.rowcount)
+        cursor.close()
+        conn.close()
+
+@route('/add', method='POST')
+def add_todo():
+        # 取出客户端传来的数据，name和todo
+        name = request.forms.get('name')
+        todo = request.forms.get('todo')
+        m_add(name, todo)
+        return '<html><h1>%s已保存</h1><a href="/todo">点击回到todo主页</a></html>'%(name)
+
+@route('/del/<name>')
+def tododel(name):
+        cursor = conn.cursor()
+	cursor.execute('delete from todo where name = %s', (name,))
+        #cursor.execute('delete from user where name = "q"')
+        conn.commit()
+        cursor.close()
+        #conn.close()  # ！！！ 加上这句话，第二次执行删除操作会报错 OperationalError: MySQL Connection not available 
+	return '<html><h1>%s已删除</h1><a href="/todo">点击回到todo主页</a></html>' %(name)
+
+# ！！！ 目前报错 InternalError: Unread result found
+def m_find(name):
+        print(name)
+        cursor = conn.cursor()
+        count = cursor.execute('select * from todo where name = %s', (name,))
+        #aa=cursor.execute("select * from todo")
+        print('11111111111111111111')
+        print(count)
+        cursor.close()
+        #conn.close()
+        return('1')
+
+@route('/find/<name>')
+def find(name):
+	todos = m_find(name)
+	return todos
+
+
+run(host='127.0.0.1',port='10090',debug=True,reloader=True)
