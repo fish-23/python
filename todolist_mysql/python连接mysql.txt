@@ -47,7 +47,7 @@
 
 from bottle import route, run, static_file
 from bottle import request
-import time
+import collections
 import mysql.connector
 
 page='''
@@ -59,6 +59,7 @@ todo <input type="text" name="todo" value=""/>
 </form>
 </html>
 '''
+
 conn = mysql.connector.connect(user='root', password='root', database='wlp')
 cursor = conn.cursor()
 
@@ -66,19 +67,42 @@ cursor = conn.cursor()
 def todo():
         return page
 
+
+@route('/create')
+def create():
+        # buffered=True会把结果集保存到本地并一次性返回，这样可以提高性能
+        cursor = conn.cursor(buffered=True)
+        try:
+            create = ('create table todo ( \
+                       id int primary key auto_increment,\
+                       name varchar(20),\
+                       todo varchar(20))\
+                       DEFAULT CHARSET = utf8')
+            cursor.execute(create)
+        except mysql.connector.Error as e:
+            return('数据表创建失败',str(e))
+        finally:
+            cursor.close() # 关闭标记位
+            #conn.close()   # 关闭数据库链接           
+        return '<html><h1>数据表创建成功</h1><a href="/todo">点击回到todo主页</a></html>'
+                
 def m_add(name, todo):
-        #cursor.execute('create table todo(id int primary key auto_increment, name varchar(20), todo varchar(20))')
-        # 插入单条数据
-        # cursor.execute('insert into todo values(%s,%s,%s)', [0,name,todo])
-        sqlin="insert into todo values(%s,%s,%s)"
-        cursor.execute(sqlin, (0,name,todo))
-        # 增加数据这块只能用%s，用%d会出错
-        # 插入多条
-        cursor.executemany(sqlin,[(0,name,todo),(0,name,todo)])
-        conn.commit()
-        print(cursor.rowcount)
-        cursor.close()
-        conn.close()
+        cursor = conn.cursor(buffered=True)
+        try:
+            # 插入单条数据
+            # 占位符只能用%s，用%d或者其他会出错
+            insert = ("insert into todo values(%s,%s,%s)")
+            data = (0,name,todo)
+            cursor.execute(insert, data)            
+            # 插入多条
+            data = [(0,name,todo),(0,name,todo)]
+            cursor.executemany(insert, data)
+            conn.commit()
+        except mysql.connector.Error as e:
+            return('数据插入失败',str(e))
+        finally:
+            cursor.close() 
+            #conn.close()   
 
 @route('/add', method='POST')
 def add_todo():
@@ -88,32 +112,51 @@ def add_todo():
         m_add(name, todo)
         return '<html><h1>%s已保存</h1><a href="/todo">点击回到todo主页</a></html>'%(name)
 
+
 @route('/del/<name>')
-def tododel(name):
-        cursor = conn.cursor()
-	cursor.execute('delete from todo where name = %s', (name,))
-        #cursor.execute('delete from user where name = "q"')
-        conn.commit()
-        cursor.close()
-        #conn.close()  # ！！！ 加上这句话，第二次执行删除操作会报错 OperationalError: MySQL Connection not available 
+def del_todo(name):
+        cursor = conn.cursor(buffered=True)
+        try:
+	    cursor.execute('delete from todo where name = %s', (name,))	
+            conn.commit()
+        except mysql.connector.Error as e:
+            print('数据删除失败',str(e))
+        finally:
+            cursor.close() 
+            #conn.close()        
+            #conn.close()  # ！！！ 加上这句话，第二次执行删除操作会报错 OperationalError: MySQL Connection not available 
 	return '<html><h1>%s已删除</h1><a href="/todo">点击回到todo主页</a></html>' %(name)
 
-# ！！！ 目前报错 InternalError: Unread result found
+        
 def m_find(name):
-        print(name)
-        cursor = conn.cursor()
-        count = cursor.execute('select * from todo where name = %s', (name,))
-        #aa=cursor.execute("select * from todo")
-        print('11111111111111111111')
-        print(count)
-        cursor.close()
-        #conn.close()
-        return('1')
+        cursor = conn.cursor(buffered=True)
+        try:
+            lis = [] 
+            dic = collections.OrderedDict()
+	    select = 'select name,todo from todo where name = %s'
+            cursor.execute(select, (name,))
+	    ret = cursor.fetchall()
+            for name,todo in ret:
+                dic['name'] = name
+                dic['todo'] = todo
+                lis.append(dic)
+            count = len(lis)
+        except mysql.connector.Error as e:
+            return('数据查找失败',str(e))
+        finally:
+            cursor.close() 
+            #conn.close()          
+	return '<html><h1>共%s条数据, %s</h1><a href="/todo">点击回到todo主页</a></html>' %(count,lis)
 
 @route('/find/<name>')
-def find(name):
+def find_todo(name):
 	todos = m_find(name)
 	return todos
 
-
 run(host='127.0.0.1',port='10090',debug=True,reloader=True)
+
+
+参考文档：
+https://www.cnblogs.com/R-bear/p/7022231.html
+https://dev.mysql.com/doc/connector-python/en/
+廖雪峰python
