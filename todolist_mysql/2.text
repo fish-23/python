@@ -1,0 +1,11 @@
+Bottle v0.12.13 server starting up (using WSGIRefServer())...
+Listening on http://127.0.0.1:10090/
+Hit Ctrl-C to quit.
+
+127.0.0.1 - - [10/Jul/2018 16:39:17] "GET /todo HTTP/1.0" 200 191
+127.0.0.1 - - [10/Jul/2018 16:39:30] "POST /add HTTP/1.0" 200 74
+127.0.0.1 - - [10/Jul/2018 16:39:31] "GET /todo HTTP/1.0" 200 191
+127.0.0.1 - - [10/Jul/2018 16:39:38] "GET /find/q HTTP/1.0" 200 126
+127.0.0.1 - - [10/Jul/2018 16:39:38] "GET /find/q HTTP/1.0" 200 126
+127.0.0.1 - - [10/Jul/2018 16:40:30] "GET /add HTTP/1.0" 405 737
+127.0.0.1 - - [10/Jul/2018 16:40:38] "GET /find/q HTTP/1.0" 200 126

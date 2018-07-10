@@ -1,0 +1,69 @@
+﻿<html>
+<form action="/api/register_add" method="post">
+<fieldset>
+   <legend> <h1>用户注册 </h1></legend>
+
+<table>
+<tr>
+ <td> 性别：</td> 
+ <td> 男<input type="radio" checked="checked" name="sex" value="male">  </td>
+ <td> 女<input type="radio" name="sex" value="female">  </td>
+</tr>
+</table>
+
+<table>
+<tr>
+ <td>年龄段: </td>
+ <td colspan="2">
+<select name="age">
+ <option value="middle"> 儿童 </option>
+ <option value="high">青少年 </option>
+ <option value="bachlor" selected="selected">青年</option>
+ <option value="high">中年 </option>
+ <option value="master">老年</option>
+ </select>
+ </td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <td>
+  <label> 用户名: </label>
+  <input type="text" name="name" value=""/>
+  <label> 密码: </label>
+  <input type="password" name="password" value=""/>
+  <label> 确认密码: </label>
+  <input type="password" name="password2" value=""/>
+  </td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <td>
+  <label>个人姓名:<label>
+  <input type="text" name="full_name" cols="10" value=""/>
+  <label>出生日期:<label>
+  <input type="text" name="birthday" value=""/>
+  <label>手机号:<label>
+  <input type="text" name="number" value=""/>
+  </td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <td ><label>备注: </label></td>
+  <td ><textarea name="remark" row="1" cols="40"> </textarea> </td>
+</tr>
+</table>
+
+<table>
+<tr>
+<input type="submit" value="注册"/>
+</tr>
+</table>
+</form>
+</html>
+
