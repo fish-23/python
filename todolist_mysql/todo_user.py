@@ -20,24 +20,47 @@ def login_check_n(name):
         select_name = ('select * from user where name =%s')
         cursor.execute(select_name, (name,))
         ret = cursor.fetchall()
-        ret = len(ret)
         cursor.close()
-	if ret == 0:
+	if ret == []:
 		return -1
 	return 0
 
 def login_check(name, passwd):
-        print('1111111111111')
-        print(passwd)
         passwd = hashlib.md5(passwd).hexdigest()
-        print(passwd)
         cursor = conn.cursor(buffered=True)
         select_name = ('select passwd from user where name =%s')
         cursor.execute(select_name, (name,))
         ret = cursor.fetchall()
-        print(ret)
         ret = ret[0][0]
-        print(ret)
 	if ret == passwd:
 		return 0
 	return -1
+
+# 检测 login 页面
+def check_login(name):
+        cursor = conn.cursor(buffered=True)
+        select_name = ('select cookie_num,login_time from user where name =%s')
+        cursor.execute(select_name, (name,))
+        ret = cursor.fetchall()
+        if ret == []:
+                return -1
+        db_cookie_num = ret[0][0]
+        db_login_time = ret[0][1]
+        cursor.close()
+	cookie_num = name + ';' + '1'
+	if db_cookie_num <> cookie_num:
+		return -1
+        db_login_time = time.strptime(db_login_time, "%Y-%m-%d %H:%M:%S")
+        db_login_time = int(time.mktime(db_login_time))
+        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        now = time.strptime(now, "%Y-%m-%d %H:%M:%S")
+        now = int(time.mktime(now))
+        time = db_login_time + 86400
+        if now > time:
+                cookie_num = name + ';' + '2'
+                cursor = conn.cursor(buffered=True)
+                up_login = ('update user set cookie_num = %s where name = %s')
+                cursor.execute(up_login, (cookie_num, name))
+                conn.commit()
+                cursor.close()
+                return -1

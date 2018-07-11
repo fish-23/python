@@ -49,9 +49,24 @@ def login():
 	cursor.execute(up_login, data)
 	conn.commit()
 	cursor.close()
-	response.set_cookie('cookie_name', name, secret = 'asf&*457', domain='libsm.com', path = '/')
+	response.set_cookie('cookie_name', name, secret = 'asf&*457', domain='114.67.224.92', path = '/')
 	#redirect('/list')
         print('1111')
+
+# cancel 页面                  
+@app.route('/cancel')
+def cancel():
+	name = request.get_cookie('cookie_name', secret = 'asf&*457')
+	if check_login(name) == -1:
+		return red_writing_1(u'用户已经注销','/todo',u'点击回到todo主页')
+        cookie_num = name + ';' + '2'
+        cursor = conn.cursor(buffered=True)
+        up_login = ('update user set cookie_num = %s where name = %s')
+        cursor.execute(up_login, (cookie_num, name))
+        conn.commit()
+        cursor.close()
+	return red_writing_1(u'账户已注销','/todo',u'点击返回todo主页')	
+
 
 @app.error(404)
 def err(err):
