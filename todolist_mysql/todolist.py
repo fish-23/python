@@ -11,16 +11,20 @@ from bson.objectid import ObjectId
 import smtplib,time,datetime,re,hashlib
 import mysql.connector
 
+import sys
+sys.path.append('/root')
+from config import *
 from todo_view import *
 from todo_user import *
 
-conn = mysql.connector.connect(user='root', password='root', database='wlp')
+conn = mysql.connector.connect(user=MYUSER, password=MYPASSWORD, database=MYDATABASE)
 cursor = conn.cursor()
 
 app = application = bottle.Bottle()
 @app.route('/todo')
 def todo():
-	todo_html = read_file("tmpl/todo_html.html")
+        send_num()
+	todo_html = read_file("tmpl/todo.html")
 	return todo_html
 
 # login 页面
@@ -66,6 +70,53 @@ def cancel():
         conn.commit()
         cursor.close()
 	return red_writing_1(u'账户已注销','/todo',u'点击返回todo主页')	
+
+
+# register 页面
+@app.route('/register')
+def register_page():
+	register_html = read_file("tmpl/register_html.html")
+	return register_html
+
+@app.route('/api/register_sms', method="post")
+def register_mailver():
+	phone = request.forms.get('phone')	
+        checkret = reg_checkphone(phone)
+        if checkret = -1:
+                return red_writing_2(u'该手机号已注册','/login',u'点击登录','/todo',u'点击进入todo主页')
+        if checkret = -2:
+                return red_writing_1(u'手机号格式不正确','/register',u'点击重新输入')
+        sendret = reg_sendsms(phone)
+        if sendret = -1:
+                return red_writing_1(u'=短信发送异常','/register',u'点击重新输入')
+        response.set_cookie('cookie_register','%s'%(phone), domain='libsm.com', path = '/', secret = 'asf&*4561')
+        redirect('/register_info')
+
+@app.route('/register_info')
+def register_info():
+	register_html = read_file("tmpl/register_info.html")
+	return register_html
+
+@app.route('/api/register_addinfo')
+def register_addinfo():
+        phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
+        name = request.forms.get('name')
+        password = request.forms.get('password')
+	if len(name) < 6 | name.isspace() == True | len(password) < 6 | password.isspace() == True:
+	    return red_writing_1(u'用户名密码格式错误','/register_info',u'点击返回') + u'用户名密码应大于六位'
+	if reg_checkname(name) == -1:
+	    return red_writing_1(u'用户名已存在','/register_info',u'点击返回')
+	password2 = request.forms.get('password2')
+	if password <> password2:
+	    return red_writing_1(u'两次密码不一致','/register_info',u'点击返回')
+	sms_num = request.forms.get('sms_num')
+	smsnumret = reg_checksmsnum(phone,sms_num)
+	if smsnumret == -1:
+            return red_writing_1(u'验证码不正确','/register_info',u'点击返回')
+        if smsnumret == -2:
+            return red_writing_1(u'验证码超时','/register',u'点击重新注册')
+	register_addinfo(phone, name, password)
+	redirect('/login')
 
 
 @app.error(404)
