@@ -23,14 +23,13 @@ cursor = conn.cursor()
 app = application = bottle.Bottle()
 @app.route('/todo')
 def todo():
-        send_num()
 	todo_html = read_file("tmpl/todo.html")
 	return todo_html
 
 # login 页面
 @app.route('/login', method='GET')
 def login_page():
-	login_html = read_file("tmpl/login_html.html")
+	login_html = read_file("tmpl/login.html")
 	return login_html
 
 @app.route('/api/login', method="POST")
@@ -38,12 +37,12 @@ def login():
 	name = request.forms.get('name')
 	if name == '':
 		return red_writing_2(u'用户名不能为空','/login',u'点击重新登录','/todo',u'点击进入todo主页')
-	passwd = request.forms.get('password')
-	if passwd == '':
+	password = request.forms.get('password')
+	if password == '':
 		return red_writing_2(u'密码不能为空','/login',u'点击重新登录','/todo',u'点击进入todo主页')
 	if login_check_n(name) == -1:
 		return red_writing_3(u'用户名不存在','/login',u'点击重新登录','/retrieve_user',u'点击找回用户名','/todo',u'点击进入todo主页')
-	if login_check(name, passwd) == -1:
+	if login_check(name, password) == -1:
 		return red_writing_3(u'密码错误','/login',u'点击重新登录','/mpw',u'点击找回密码','/retrieve_user',u'点击找回用户名')
 	cookie_num = name + ';' + '1'
 	login_time = datetime.datetime.now()	
@@ -75,21 +74,23 @@ def cancel():
 # register 页面
 @app.route('/register')
 def register_page():
-	register_html = read_file("tmpl/register_html.html")
+	register_html = read_file("tmpl/register.html")
 	return register_html
 
 @app.route('/api/register_sms', method="post")
 def register_mailver():
 	phone = request.forms.get('phone')	
         checkret = reg_checkphone(phone)
-        if checkret = -1:
+        if checkret == -1:
                 return red_writing_2(u'该手机号已注册','/login',u'点击登录','/todo',u'点击进入todo主页')
-        if checkret = -2:
+        if checkret == -2:
                 return red_writing_1(u'手机号格式不正确','/register',u'点击重新输入')
+        if checkret == -3:
+                return red_writing_1(u'上次注册异常','/register',u'点击重新注册')
         sendret = reg_sendsms(phone)
-        if sendret = -1:
+        if sendret == -1:
                 return red_writing_1(u'=短信发送异常','/register',u'点击重新输入')
-        response.set_cookie('cookie_register','%s'%(phone), domain='libsm.com', path = '/', secret = 'asf&*4561')
+        response.set_cookie('cookie_register','%s'%(phone), domain='114.67.224.92', path = '/', secret = 'asf&*4561')
         redirect('/register_info')
 
 @app.route('/register_info')
@@ -97,9 +98,10 @@ def register_info():
 	register_html = read_file("tmpl/register_info.html")
 	return register_html
 
-@app.route('/api/register_addinfo')
+@app.route('/api/register_addinfo', method="post")
 def register_addinfo():
         phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
+        phone = '18392843706'
         name = request.forms.get('name')
         password = request.forms.get('password')
 	if len(name) < 6 | name.isspace() == True | len(password) < 6 | password.isspace() == True:
@@ -115,7 +117,7 @@ def register_addinfo():
             return red_writing_1(u'验证码不正确','/register_info',u'点击返回')
         if smsnumret == -2:
             return red_writing_1(u'验证码超时','/register',u'点击重新注册')
-	register_addinfo(phone, name, password)
+	register_add(phone, name, password)
 	redirect('/login')
 
 
