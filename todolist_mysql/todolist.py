@@ -101,10 +101,12 @@ def register_info():
 @app.route('/api/register_addinfo', method="post")
 def register_addinfo():
         phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
-        phone = '18392843706'
+        phone = '18829233166'
         name = request.forms.get('name')
         password = request.forms.get('password')
-	if len(name) < 6 | name.isspace() == True | len(password) < 6 | password.isspace() == True:
+        #if name == '' or len(name) < 6:
+            #return red_writing_1(u'用','/register_info',u'点击返回') + u'用户名密码应大于六位'
+	if len(name) < 6 or name.isspace() == True or len(password) < 6 or password.isspace() == True:
 	    return red_writing_1(u'用户名密码格式错误','/register_info',u'点击返回') + u'用户名密码应大于六位'
 	if reg_checkname(name) == -1:
 	    return red_writing_1(u'用户名已存在','/register_info',u'点击返回')
@@ -117,6 +119,8 @@ def register_addinfo():
             return red_writing_1(u'验证码不正确','/register_info',u'点击返回')
         if smsnumret == -2:
             return red_writing_1(u'验证码超时','/register',u'点击重新注册')
+        if smsnumret == -3:
+            return red_writing_1(u'验证码是纯数字','/register_info',u'点击返回')
 	register_add(phone, name, password)
 	redirect('/login')
 

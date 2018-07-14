@@ -2,10 +2,85 @@ Bottle v0.12.13 server starting up (using WSGIRefServer())...
 Listening on http://127.0.0.1:10090/
 Hit Ctrl-C to quit.
 
-127.0.0.1 - - [10/Jul/2018 16:39:17] "GET /todo HTTP/1.0" 200 191
-127.0.0.1 - - [10/Jul/2018 16:39:30] "POST /add HTTP/1.0" 200 74
-127.0.0.1 - - [10/Jul/2018 16:39:31] "GET /todo HTTP/1.0" 200 191
-127.0.0.1 - - [10/Jul/2018 16:39:38] "GET /find/q HTTP/1.0" 200 126
-127.0.0.1 - - [10/Jul/2018 16:39:38] "GET /find/q HTTP/1.0" 200 126
-127.0.0.1 - - [10/Jul/2018 16:40:30] "GET /add HTTP/1.0" 405 737
-127.0.0.1 - - [10/Jul/2018 16:40:38] "GET /find/q HTTP/1.0" 200 126
+127.0.0.1 - - [14/Jul/2018 09:46:18] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 09:46:19] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 09:46:20] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 09:46:21] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 10:06:37] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:06:39] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:06:58] "POST /api/login HTTP/1.0" 200 0
+127.0.0.1 - - [14/Jul/2018 10:07:02] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:07:08] "POST /api/register_sms HTTP/1.0" 200 154
+127.0.0.1 - - [14/Jul/2018 10:07:13] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:07:58] "GET /api/login HTTP/1.0" 405 124
+127.0.0.1 - - [14/Jul/2018 10:08:02] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:08:08] "GET /api/register_sms HTTP/1.0" 405 124
+Bottle v0.12.13 server starting up (using WSGIRefServer())...
+Listening on http://127.0.0.1:10090/
+Hit Ctrl-C to quit.
+
+127.0.0.1 - - [14/Jul/2018 10:14:02] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:14:04] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 10:14:05] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:14:33] "POST /api/register_sms HTTP/1.0" 200 127
+127.0.0.1 - - [14/Jul/2018 10:14:35] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:14:49] "POST /api/register_sms HTTP/1.0" 200 127
+127.0.0.1 - - [14/Jul/2018 10:14:50] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:14:58] "POST /api/register_sms HTTP/1.0" 200 127
+127.0.0.1 - - [14/Jul/2018 10:14:59] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:15:08] "POST /api/register_sms HTTP/1.0" 200 127
+127.0.0.1 - - [14/Jul/2018 10:15:10] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:15:13] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:15:17] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 10:15:18] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:15:29] "POST /api/register_sms HTTP/1.0" 200 127
+127.0.0.1 - - [14/Jul/2018 10:15:33] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:15:46] "POST /api/register_sms HTTP/1.0" 200 154
+127.0.0.1 - - [14/Jul/2018 10:15:48] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:15:51] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 10:15:52] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:15:59] "POST /api/register_sms HTTP/1.0" 302 0
+127.0.0.1 - - [14/Jul/2018 10:15:59] "GET /register_info HTTP/1.0" 200 695
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/site-packages/bottle.py", line 861, in _handle
+    return route.call(**args)
+  File "/usr/lib/python2.7/site-packages/bottle.py", line 1739, in wrapper
+    rv = callback(*a, **ka)
+  File "todolist.py", line 115, in register_addinfo
+    smsnumret = reg_checksmsnum(phone,sms_num)
+  File "/root/python/todolist_mysql/todo_user.py", line 169, in reg_checksmsnum
+    if sms_num.isnumeric() == False:
+AttributeError: 'str' object has no attribute 'isnumeric'
+127.0.0.1 - - [14/Jul/2018 10:16:09] "POST /api/register_addinfo HTTP/1.0" 500 1548
+127.0.0.1 - - [14/Jul/2018 10:16:59] "GET /register_info HTTP/1.0" 200 695
+127.0.0.1 - - [14/Jul/2018 10:17:09] "GET /api/register_addinfo HTTP/1.0" 405 124
+Bottle v0.12.13 server starting up (using WSGIRefServer())...
+Listening on http://127.0.0.1:10090/
+Hit Ctrl-C to quit.
+
+127.0.0.1 - - [14/Jul/2018 10:18:08] "POST /api/register_addinfo HTTP/1.0" 302 0
+127.0.0.1 - - [14/Jul/2018 10:18:08] "GET /login HTTP/1.0" 200 252
+Bottle v0.12.13 server starting up (using WSGIRefServer())...
+Listening on http://127.0.0.1:10090/
+Hit Ctrl-C to quit.
+
+127.0.0.1 - - [14/Jul/2018 10:20:16] "POST /api/register_addinfo HTTP/1.0" 200 120
+127.0.0.1 - - [14/Jul/2018 10:20:48] "POST /api/register_addinfo HTTP/1.0" 302 0
+127.0.0.1 - - [14/Jul/2018 10:20:48] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:21:24] "POST /api/register_addinfo HTTP/1.0" 200 120
+127.0.0.1 - - [14/Jul/2018 10:21:25] "GET /register_info HTTP/1.0" 200 695
+127.0.0.1 - - [14/Jul/2018 10:22:16] "POST /api/register_addinfo HTTP/1.0" 200 123
+127.0.0.1 - - [14/Jul/2018 10:22:17] "GET /register_info HTTP/1.0" 200 695
+127.0.0.1 - - [14/Jul/2018 10:22:24] "GET /todo HTTP/1.0" 200 560
+127.0.0.1 - - [14/Jul/2018 10:22:25] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:23:06] "POST /api/register_sms HTTP/1.0" 200 154
+127.0.0.1 - - [14/Jul/2018 10:23:07] "GET /login HTTP/1.0" 200 252
+127.0.0.1 - - [14/Jul/2018 10:23:18] "POST /api/register_sms HTTP/1.0" 200 154
+127.0.0.1 - - [14/Jul/2018 10:23:20] "GET /register HTTP/1.0" 200 288
+127.0.0.1 - - [14/Jul/2018 10:23:25] "POST /api/register_sms HTTP/1.0" 200 154
+127.0.0.1 - - [14/Jul/2018 10:23:26] "GET /register HTTP/1.0" 200 288
+Bottle v0.12.13 server starting up (using WSGIRefServer())...
+Listening on http://127.0.0.1:10090/
+Hit Ctrl-C to quit.
+
+127.0.0.1 - - [14/Jul/2018 10:24:06] "GET /register HTTP/1.0" 200 288

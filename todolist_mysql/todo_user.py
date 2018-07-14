@@ -158,15 +158,17 @@ def reg_checkname(name):
         if ret <> 0:
 	    return -1
 
-def reg_checksmsnum(phone,sms_num):        
+def reg_checksmsnum(phone,sms_num):
+        print('sms_num == %s'%sms_num)        
         cursor = conn.cursor(buffered=True)
         select_smsnum = ('select sms_num, sms_time from user where phone =%s')
-        cursor.execute(select_smsnum, (phone,))
-        
+        cursor.execute(select_smsnum, (phone,))        
         ret = cursor.fetchall()        
         db_smsnum = ret[0][0]
         db_smstime = ret[0][1]
-        cursor.close()               
+        cursor.close()
+        if sms_num.isdigit() == False:
+            return -3
         if int(sms_num) <> int(db_smsnum):
 	    return -1
         import datetime

@@ -7,3 +7,11 @@
 11111111111111
 [(u'q', u'q')]
 1
+1111
+{u'ext': u'', u'fee': 1, u'result': 0, u'errmsg': u'OK', u'sid': u'8:IbbzDoSWYwsH4BHOMXK20180713'}
+{u'ext': u'', u'fee': 1, u'result': 0, u'errmsg': u'OK', u'sid': u'8:L005ZEbi7i4mRnUaDzl20180713'}
+----------------------------------------
+Exception happened during processing of request from ('127.0.0.1', 51390)
+1111
+{u'ext': u'', u'fee': 1, u'result': 0, u'errmsg': u'OK', u'sid': u'8:WrzjLGcm8rtyOSPJCVV20180714'}
+111111111111
