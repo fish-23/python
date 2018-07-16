@@ -163,7 +163,10 @@ def reg_checksmsnum(phone,sms_num):
         cursor = conn.cursor(buffered=True)
         select_smsnum = ('select sms_num, sms_time from user where phone =%s')
         cursor.execute(select_smsnum, (phone,))        
-        ret = cursor.fetchall()        
+        ret = cursor.fetchall() 
+        print('phone == %s'%phone)
+        print('sms_num == %s'%sms_num)
+        print('ret == %s'%ret)       
         db_smsnum = ret[0][0]
         db_smstime = ret[0][1]
         cursor.close()

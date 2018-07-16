@@ -101,7 +101,7 @@ def register_info():
 @app.route('/api/register_addinfo', method="post")
 def register_addinfo():
         phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
-        phone = '18829233166'
+        phone = '18392843706'
         name = request.forms.get('name')
         password = request.forms.get('password')
         #if name == '' or len(name) < 6:
