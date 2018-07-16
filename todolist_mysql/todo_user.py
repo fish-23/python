@@ -57,6 +57,9 @@ def check_login(name):
 	cookie_num = name + ';' + '1'
 	if db_cookie_num <> cookie_num:
 		return -1
+        import time
+        print(db_login_time,type(db_login_time))
+        db_login_time = str(db_login_time)
         db_login_time = time.strptime(db_login_time, "%Y-%m-%d %H:%M:%S")
         db_login_time = int(time.mktime(db_login_time))
         now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -191,6 +194,44 @@ def register_add(phone, name, password):
         insert = ("update user set name=%s, password=%s where phone = %s")
         data = (name, password, phone)
         cursor.execute(insert, data)
+        conn.commit()
+        cursor.close()
+        return 0
+
+
+# list 页面
+def list_userid(name):
+        cursor = conn.cursor(buffered=True)
+        select_user = ('select id from user where name =%s')
+        cursor.execute(select_user, (name,))
+        ret_user = cursor.fetchall()
+        user_id = ret_user[0][0]
+        cursor.close()
+        return user_id
+
+def list_todo(user_id):
+        cursor = conn.cursor(buffered=True)
+        select_todo = ('select id,todo,create_time from todo where user_id =%s order by create_time asc')
+        cursor.execute(select_todo, (user_id,))
+        ret_todo = cursor.fetchall()
+        cursor.close()
+        return ret_todo
+
+def list_todoadd(todo_new,user_id):
+        cursor = conn.cursor(buffered=True)
+        select_todo = ('select * from todo where user_id = %s')
+        cursor.execute(select_todo, (user_id,))
+        ret_todoall = cursor.fetchall()
+        if len(ret_todoall) > 10:
+            return -1
+        print(len(ret_todoall))
+        print(ret_todoall)
+        cursor.close()
+        cursor = conn.cursor(buffered=True)
+        datatime = datetime.datetime.now()
+        insert_todo = ('insert into todo values(%s,%s,%s,%s)')
+        data = (0, todo_new, user_id, datatime)
+        cursor.execute(insert_todo, data)
         conn.commit()
         cursor.close()
         return 0

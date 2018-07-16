@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+import time
 display_space = '&nbsp' + '&nbsp' + '&nbsp' + '&nbsp' + '&nbsp' + '&nbsp'
 
 def red_writing(msg):
@@ -38,21 +39,6 @@ def update_todo(old_todo,old_todo_id):
 	modify_html =modify_html + u'<input type="submit" value="修改"/>' + '</form>' + '</html>'
 	return modify_html
 
-def list_h(list_show):
-	h = u'<html><body>'
-	display_space = '&nbsp'*6
-	for d in list_show:
-		html_list_new = d['list_new']
-		h = h + '<font color="red">' + html_list_new + '</font>' + display_space 
-		h = h + '<a href="/list_del/' + str(d['_id']) + u'">删除</a>' + display_space 
-		h = h + '<a href="/modify_todo/' + str(d['_id']) + u'">修改</a ><br>'
-	welcome = u'<fieldset><legend><h2>欢迎来到个人主页</h2></legend>'
-	entry_time = '<br>' + u'进入主页时间:' + display_space +'%s'%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-	list_new_link = u'<br> <a href="/list_new">点击添加</a ><body></html>'
-	todo_link = u'<a href="/todo">点击进入todo页面</a ><body></html>'
-	cance_link = u'<a href="/cancel">点击注销</a ><body></html>' + '<br>'
-	h = welcome+ h + list_new_link + display_space + todo_link + display_space + cance_link + entry_time
-	return h
 
 def retrieve_mail_h(old_mailbox):
 	mail_html = '<html>'
@@ -64,3 +50,23 @@ def retrieve_mail_h(old_mailbox):
 	return 	mail_html
 
 
+def list_todoshow(ret_todo):
+	h = u'<html><body>'
+	display_space = '&nbsp'*6
+        for i in range(len(ret_todo)):
+		html_todo = ret_todo[i][1]
+		html_todoid = ret_todo[i][0]
+		html_todotime = ret_todo[i][2]
+		html_time = str(html_todotime)
+                html_time = html_time[:10]
+		h = h + '<font color="red">' + html_todo + '</font>' + display_space
+		h = h + '<font>' + html_time + '</font>' + display_space
+		h = h + '<a href="/list_del/' + str(html_todoid) + u'">删除</a>' + display_space 
+		h = h + '<a href="/modify_todo/' + str(html_todoid) + u'">修改</a ><br>'
+	welcome = u'<fieldset><legend><h2>欢迎来到个人主页</h2></legend>'
+	entry_time = '<br>' + u'进入主页时间:' + display_space +'%s'%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+	list_new_link = u'<br> <a href="/list_new">点击添加</a ><body></html>'
+	todo_link = u'<a href="/todo">点击进入todo页面</a ><body></html>'
+	cance_link = u'<a href="/cancel">点击注销</a ><body></html>' + '<br>'
+	h = welcome+ h + list_new_link + display_space + todo_link + display_space + cance_link + entry_time
+	return h

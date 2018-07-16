@@ -53,8 +53,7 @@ def login():
 	conn.commit()
 	cursor.close()
 	response.set_cookie('cookie_name', name, secret = 'asf&*457', domain='114.67.224.92', path = '/')
-	#redirect('/list')
-        print('1111')
+	redirect('/list')
 
 # cancel 页面                  
 @app.route('/cancel')
@@ -123,6 +122,49 @@ def register_addinfo():
             return red_writing_1(u'验证码是纯数字','/register_info',u'点击返回')
 	register_add(phone, name, password)
 	redirect('/login')
+
+
+# list 页面
+@app.route('/list_new')
+def list_new():
+	name = request.get_cookie('cookie_name', secret = 'asf&*457')
+	name = 'qqqqqq'
+	if check_login(name) == -1:
+		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
+	list_html = read_file("tmpl/list.html")
+	return list_html
+
+@app.route('/api/list_add',method='POST')
+def list_new():
+	name = request.get_cookie('cookie_name', secret = 'asf&*457')
+	name = 'qqqqqq'
+	if check_login(name) == -1:
+		return red_writing_1(u'用户尚未登录','/login',u'点击登录')	
+	todo_new = request.forms.get('todo_new')
+	user_id = list_userid(name)
+	if todo_new == '':
+		return red_writing_1(u'不允许添加空的todo','/list',u'点击回到个人主页')
+	if todo_new.isspace() == True:
+		return red_writing_1(u'不允许只包含空格','/list',u'点击回到个人主页')
+        ret_todoall = list_todoadd(todo_new,user_id)
+        if int(ret_todoall) == -1:
+                return red_writing_1(u'代办事项不能超过10条','/list',u'点击回到个人主页')
+        else:
+	        redirect('/list')
+
+@app.route('/list')
+def list_show():
+	name = request.get_cookie('cookie_name', secret = 'asf&*457')
+	name = 'qqqqqq'
+	if check_login(name) == -1:
+		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
+        select_user = ('select id from user where name =%s')
+        user_id = list_userid(name)
+        ret_todo = list_todo(user_id)
+        if ret_todo == []:
+                return red_writing_1(u'欢迎来到个人主页','/list_new',u'点击添加第一条todo')
+	h = list_todoshow(ret_todo)
+	return h
 
 
 @app.error(404)
