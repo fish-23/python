@@ -89,7 +89,8 @@ def register_mailver():
         sendret = reg_sendsms(phone)
         if sendret == -1:
                 return red_writing_1(u'=短信发送异常','/register',u'点击重新输入')
-        response.set_cookie('cookie_register','%s'%(phone), domain='114.67.224.92', path = '/', secret = 'asf&*4561')
+        response.set_cookie('cookie_register', phone, domain='114.67.224.92', path = '/', secret = 'asf&*4561')
+        #response.set_cookie('cookie_name', name, secret = 'asf&*457', domain='114.67.224.92', path = '/')
         redirect('/register_info')
 
 @app.route('/register_info')
@@ -100,7 +101,7 @@ def register_info():
 @app.route('/api/register_addinfo', method="post")
 def register_addinfo():
         phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
-        phone = '18392843706'
+        print('register_addinfo phone == %s'%phone)
         name = request.forms.get('name')
         password = request.forms.get('password')
         #if name == '' or len(name) < 6:
@@ -128,7 +129,6 @@ def register_addinfo():
 @app.route('/list_new')
 def list_new():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
-	name = 'qqqqqq'
 	if check_login(name) == -1:
 		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
 	list_html = read_file("tmpl/list.html")
@@ -137,7 +137,6 @@ def list_new():
 @app.route('/api/list_add',method='POST')
 def list_new():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
-	name = 'qqqqqq'
 	if check_login(name) == -1:
 		return red_writing_1(u'用户尚未登录','/login',u'点击登录')	
 	todo_new = request.forms.get('todo_new')
@@ -153,9 +152,9 @@ def list_new():
 	        redirect('/list')
 
 @app.route('/list')
-def list_show():
+def list():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
-	name = 'qqqqqq'
+        print('name =  %s'%name)
 	if check_login(name) == -1:
 		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
         select_user = ('select id from user where name =%s')
@@ -165,6 +164,35 @@ def list_show():
                 return red_writing_1(u'欢迎来到个人主页','/list_new',u'点击添加第一条todo')
 	h = list_todoshow(ret_todo)
 	return h
+
+
+# 删除 todo 页面
+@app.route('/list_del/<todoid>')
+def lis_del(todoid):
+	name = request.get_cookie('cookie_name', secret = 'asf&*457')
+	if check_login(name) == -1:
+		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
+	del_todo(todoid)
+	return redirect('/list')
+
+# 修改 todo 页面
+@app.route('/modify_todo/<todoid>')
+def modify_todo(todoid):
+	name = request.get_cookie('cookie_name', secret = 'asf&*457')
+	if check_login(name) == -1:
+		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
+	old_todo = str(find_oldtodo(todoid))
+	modifytodo_html = update_todohtml(old_todo,todoid)
+	return modifytodo_html
+	
+@app.route('/api/modify_todo',method="post")
+def modify_todo():
+	new_todo = request.forms.get('new_todo')
+	old_todo_id = request.forms.get('old_id')
+        print('222222222222222222')
+        print(old_todo_id)
+        update_todo(old_todo_id, new_todo)
+	return redirect('/list')
 
 
 @app.error(404)
