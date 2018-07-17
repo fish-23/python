@@ -9,6 +9,7 @@ import bottle
 from random import randint
 from bson.objectid import ObjectId
 import smtplib,time,datetime,re,hashlib
+import collections
 import mysql.connector
 
 import sys
@@ -101,7 +102,6 @@ def register_info():
 @app.route('/api/register_addinfo', method="post")
 def register_addinfo():
         phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
-        print('register_addinfo phone == %s'%phone)
         name = request.forms.get('name')
         password = request.forms.get('password')
         #if name == '' or len(name) < 6:
@@ -154,7 +154,6 @@ def list_new():
 @app.route('/list')
 def list():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
-        print('name =  %s'%name)
 	if check_login(name) == -1:
 		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
         select_user = ('select id from user where name =%s')
@@ -189,10 +188,56 @@ def modify_todo(todoid):
 def modify_todo():
 	new_todo = request.forms.get('new_todo')
 	old_todo_id = request.forms.get('old_id')
-        print('222222222222222222')
-        print(old_todo_id)
         update_todo(old_todo_id, new_todo)
 	return redirect('/list')
+
+
+# 修改 password 页面
+@app.route('/mpw', method='GET')
+def mpw():
+	modify_passw_html = read_file("tmpl/passwd.html")
+	return modify_passw_html
+
+@app.route('/api/mpw', method='POST')
+def api_mpw():
+	phone = request.forms.get('phonenum')
+        ret_checkp = passwd_checkp(phone)
+        if int(ret_checkp) == -1:
+                return red_writing_1(u'手机号与注册手机号不一致','/mpw',u'点击重新输入')
+	ret_sendsms = passwd_sendsms(phone)
+	response.set_cookie('passwd_info', '%s'%(ret_sendsms), domain='114.67.224.92', path = '/', secret = 'asf&*45691') 
+	redirect('/mpw_change')
+	
+@app.route('/mpw_change')
+def mpw_change():
+	mpw_change_html = read_file("tmpl/passwd_change.html")
+	return mpw_change_html
+
+@app.route('/api/mpw_change', method="post")
+def api_mpw_change():
+	mpw_info = request.get_cookie('passwd_info', secret = 'asf&*45691')
+	sms_num = request.forms.get('sms_num')
+	passwd1 = request.forms.get('pass')
+	passwd2 = request.forms.get('pass2')
+        print(mpw_info)
+        mpw_info = eval(mpw_info)
+	db_sms_num = mpw_info['sms_num']
+	db_phone = mpw_info['phone']
+	db_sms_time = mpw_info['sms_time']
+	time_now = int(time.time())
+	check_time = int(db_sms_time) + 1800
+        if sms_num.isdigit() == False:
+                return red_writing_1(u'验证码是纯数字','/mpw_change',u'点击重新输入')
+	if int(sms_num) <> int(db_sms_num):
+                return red_writing_1(u'验证码错误','/mpw_change',u'点击重新输入')
+        if time_now > check_time:
+                return red_writing_1(u'验证码失效','/mpw',u'点击重新获取')
+        if passwd1 <> passwd2:
+                return red_writing_1(u'两次密码不一致','/mpw_change',u'点击重新输入')
+        if len(passwd1) < 6 or passwd1.isspace() == True:
+                return red_writing_1(u'密码格式错误','/mpw_change',u'点击重新输入') + u'密码必须大于六位'
+        passwd_add(db_phone,passwd1)
+	return red_writing_1(u'密码修改成功','/todo',u'点击返回主页')
 
 
 @app.error(404)

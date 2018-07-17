@@ -259,4 +259,36 @@ def update_todo(old_id, new_todo):
         cursor.execute(insert, data)
         conn.commit()
         cursor.close()
-        return 0  
+        return 0 
+
+
+# 修改passwd页面
+def passwd_checkp(phone):
+        cursor = conn.cursor(buffered=True)
+        select_phone = ('select * from user where phone =%s')
+        cursor.execute(select_phone, (phone,))
+        ret = cursor.fetchall()
+        cursor.close()
+        if ret == []:
+                return -1
+        return 0
+
+def passwd_sendsms(phone):
+        sms_num = randint(100000,999999)
+        sms_time = int(time.time())
+        send_sms(phone,sms_num)
+        d = {}
+        d['phone'] = phone
+        d['sms_num'] = sms_num
+        d['sms_time'] = sms_time
+        return d
+
+def passwd_add(db_phone,passwd1):
+        cursor = conn.cursor(buffered=True)
+        passwd1 = hashlib.md5(passwd1).hexdigest()
+        insert = ("update user set password=%s, cookie_num=%s where phone = %s")
+        data = (passwd1, '0', db_phone)
+        cursor.execute(insert, data)
+        conn.commit()
+        cursor.close()
+        return 0 
