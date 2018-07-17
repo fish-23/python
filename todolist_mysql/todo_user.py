@@ -55,10 +55,11 @@ def check_login(name):
         db_login_time = ret[0][1]
         cursor.close()
 	cookie_num = name + ';' + '1'
+        print('db_cookie_num == %s'%db_cookie_num)
+        print('cookie_num ==%s' %cookie_num)
 	if db_cookie_num <> cookie_num:
 		return -1
         import time
-        print(db_login_time,type(db_login_time))
         db_login_time = str(db_login_time)
         db_login_time = time.strptime(db_login_time, "%Y-%m-%d %H:%M:%S")
         db_login_time = int(time.mktime(db_login_time))
@@ -104,7 +105,7 @@ def reg_checkphone(phone):
         ret = len(ret)
         cursor.close()
         phoneprefix = ['130','131','132','133','134','135','136','137','138','139','150','151', \
-                       '152','153','156','158','159','170','183','182','185','186','188','189']
+                       '152','153','156','158','159','170','183','182','181','185','186','188','189']
         if len(phone)<>11:
                 return -2
         elif phone.isdigit() <> True:
@@ -162,14 +163,10 @@ def reg_checkname(name):
 	    return -1
 
 def reg_checksmsnum(phone,sms_num):
-        print('sms_num == %s'%sms_num)        
         cursor = conn.cursor(buffered=True)
         select_smsnum = ('select sms_num, sms_time from user where phone =%s')
         cursor.execute(select_smsnum, (phone,))        
         ret = cursor.fetchall() 
-        print('phone == %s'%phone)
-        print('sms_num == %s'%sms_num)
-        print('ret == %s'%ret)       
         db_smsnum = ret[0][0]
         db_smstime = ret[0][1]
         cursor.close()
@@ -222,10 +219,9 @@ def list_todoadd(todo_new,user_id):
         select_todo = ('select * from todo where user_id = %s')
         cursor.execute(select_todo, (user_id,))
         ret_todoall = cursor.fetchall()
-        if len(ret_todoall) > 10:
+        #在执行完下面判断后，会存入一条数据，所以十条数据，这块判断是9
+        if len(ret_todoall) > 9:
             return -1
-        print(len(ret_todoall))
-        print(ret_todoall)
         cursor.close()
         cursor = conn.cursor(buffered=True)
         datatime = datetime.datetime.now()
@@ -235,3 +231,32 @@ def list_todoadd(todo_new,user_id):
         conn.commit()
         cursor.close()
         return 0
+
+
+# todo 操作
+def del_todo(todoid):
+        cursor = conn.cursor(buffered=True)
+        del_todo =('delete from todo where id = %s')
+        data = (todoid,)
+        cursor.execute(del_todo,data)
+        conn.commit()
+        cursor.close()
+        return 0
+
+def find_oldtodo(todoid):
+        cursor = conn.cursor(buffered=True)
+        select_todo = ('select todo from todo where id =%s')
+        cursor.execute(select_todo, (todoid,))
+        ret = cursor.fetchall()
+        old_todo = ret[0]
+        cursor.close()
+        return(old_todo)
+
+def update_todo(old_id, new_todo):
+        cursor = conn.cursor(buffered=True)
+        insert = ("update todo set todo=%s where id = %s")
+        data = (new_todo, old_id)
+        cursor.execute(insert, data)
+        conn.commit()
+        cursor.close()
+        return 0  

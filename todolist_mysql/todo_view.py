@@ -29,15 +29,6 @@ def read_file(file_name):
 	fd.close()
 	return ct	
 
-def update_todo(old_todo,old_todo_id):
-	modify_html = '<html>'
-	modify_html =modify_html + '<form action="/api/modify_todo" method="post">'
-	modify_html =modify_html + '<font color="red">'+ u'旧todo：' + old_todo
-	modify_html =modify_html + '<br>'+'<font color=rgb(0,0,255)>' +  u'输入新的todo:'+'<input type="text" name="new_todo" value=""/>'
-	modify_html =modify_html + '<input type="hidden", name="old_id" value="'+ str(old_todo_id) + '"/>'
-	modify_html =modify_html + '<input type="hidden", name="old_todo" value="'+ str(old_todo) + '"/>'
-	modify_html =modify_html + u'<input type="submit" value="修改"/>' + '</form>' + '</html>'
-	return modify_html
 
 
 def retrieve_mail_h(old_mailbox):
@@ -59,8 +50,8 @@ def list_todoshow(ret_todo):
 		html_todotime = ret_todo[i][2]
 		html_time = str(html_todotime)
                 html_time = html_time[:10]
+                h = h + '<font>' + html_time + '</font>' + display_space
 		h = h + '<font color="red">' + html_todo + '</font>' + display_space
-		h = h + '<font>' + html_time + '</font>' + display_space
 		h = h + '<a href="/list_del/' + str(html_todoid) + u'">删除</a>' + display_space 
 		h = h + '<a href="/modify_todo/' + str(html_todoid) + u'">修改</a ><br>'
 	welcome = u'<fieldset><legend><h2>欢迎来到个人主页</h2></legend>'
@@ -70,3 +61,12 @@ def list_todoshow(ret_todo):
 	cance_link = u'<a href="/cancel">点击注销</a ><body></html>' + '<br>'
 	h = welcome+ h + list_new_link + display_space + todo_link + display_space + cance_link + entry_time
 	return h
+
+def update_todohtml(old_todo,todoid):
+	modify_html = '<html>'
+	modify_html =modify_html + '<form action="/api/modify_todo" method="post">'
+	modify_html =modify_html + '<font color="red">'+ u'旧todo：' + old_todo.encode('utf-8')
+	modify_html =modify_html + '<br>'+'<font color=rgb(0,0,255)>' +  u'输入新的todo:'+'<input type="text" name="new_todo" value=""/>'
+	modify_html =modify_html + '<input type="hidden", name="old_id" value="'+ str(todoid) + '"/>'
+	modify_html =modify_html + u'<input type="submit" value="修改"/>' + '</form>' + '</html>'
+	return modify_html
