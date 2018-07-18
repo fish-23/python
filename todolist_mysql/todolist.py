@@ -21,19 +21,38 @@ from todo_user import *
 conn = mysql.connector.connect(user=MYUSER, password=MYPASSWORD, database=MYDATABASE)
 cursor = conn.cursor()
 
-app = application = bottle.Bottle()
-@app.route('/todo')
+@route('/todo')
 def todo():
+        #x = request.environ.get('X-Real-IP')
 	todo_html = read_file("tmpl/todo.html")
 	return todo_html
 
+@route('/test')
+def fish():
+        cursor2 = conn.cursor(buffered=True)
+        select_smsnum = ('select cookie_num from user where phone =%s')
+        cursor2.execute(select_smsnum, ('18392843706',))
+        ret = cursor2.fetchall()
+        print 'ret is', ret
+        if ret == []:
+                print('用户未登陆')
+        cursor2.close()
+        db_cookie_num = ret[0][0]
+        cookie_num = 'qqqqqq' + ';' + '1'
+        print('db_cookie_num is',db_cookie_num)
+        print('cookie_num is ', cookie_num)
+        if str(db_cookie_num) <> str(cookie_num):
+                print('用户未登陆')
+
+
+
 # login 页面
-@app.route('/login', method='GET')
+@route('/login', method='GET')
 def login_page():
 	login_html = read_file("tmpl/login.html")
 	return login_html
 
-@app.route('/api/login', method="POST")
+@route('/api/login', method="POST")
 def login():
 	name = request.forms.get('name')
 	if name == '':
@@ -57,7 +76,7 @@ def login():
 	redirect('/list')
 
 # cancel 页面                  
-@app.route('/cancel')
+@route('/cancel')
 def cancel():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
@@ -72,12 +91,12 @@ def cancel():
 
 
 # register 页面
-@app.route('/register')
+@route('/register')
 def register_page():
 	register_html = read_file("tmpl/register.html")
 	return register_html
 
-@app.route('/api/register_sms', method="post")
+@route('/api/register_sms', method="post")
 def register_mailver():
 	phone = request.forms.get('phone')	
         checkret = reg_checkphone(phone)
@@ -87,19 +106,20 @@ def register_mailver():
                 return red_writing_1(u'手机号格式不正确','/register',u'点击重新输入')
         if checkret == -3:
                 return red_writing_1(u'上次注册异常','/register',u'点击重新注册')
+        if ip_check() == -1:
+                return red_writing_1(u'每个ip二十四小时之内最多获取五条验证码','/todo',u'点击返回主页')
         sendret = reg_sendsms(phone)
         if sendret == -1:
                 return red_writing_1(u'=短信发送异常','/register',u'点击重新输入')
         response.set_cookie('cookie_register', phone, domain='114.67.224.92', path = '/', secret = 'asf&*4561')
-        #response.set_cookie('cookie_name', name, secret = 'asf&*457', domain='114.67.224.92', path = '/')
         redirect('/register_info')
 
-@app.route('/register_info')
+@route('/register_info')
 def register_info():
 	register_html = read_file("tmpl/register_info.html")
 	return register_html
 
-@app.route('/api/register_addinfo', method="post")
+@route('/api/register_addinfo', method="post")
 def register_addinfo():
         phone = request.get_cookie('cookie_register', secret = 'asf&*4561')
         name = request.forms.get('name')
@@ -126,7 +146,7 @@ def register_addinfo():
 
 
 # list 页面
-@app.route('/list_new')
+@route('/list_new')
 def list_new():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
@@ -134,7 +154,7 @@ def list_new():
 	list_html = read_file("tmpl/list.html")
 	return list_html
 
-@app.route('/api/list_add',method='POST')
+@route('/api/list_add',method='POST')
 def list_new():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
@@ -151,7 +171,7 @@ def list_new():
         else:
 	        redirect('/list')
 
-@app.route('/list')
+@route('/list')
 def list():
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
@@ -166,7 +186,7 @@ def list():
 
 
 # 删除 todo 页面
-@app.route('/list_del/<todoid>')
+@route('/list_del/<todoid>')
 def lis_del(todoid):
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
@@ -175,16 +195,18 @@ def lis_del(todoid):
 	return redirect('/list')
 
 # 修改 todo 页面
-@app.route('/modify_todo/<todoid>')
+@route('/modify_todo/<todoid>')
 def modify_todo(todoid):
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
 		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
-	old_todo = str(find_oldtodo(todoid))
+	old_todo = find_oldtodo(todoid)
+        #old_todo = old_todo.encode('utf-8')
+        print('todolist old_todo is', old_todo)
 	modifytodo_html = update_todohtml(old_todo,todoid)
 	return modifytodo_html
 	
-@app.route('/api/modify_todo',method="post")
+@route('/api/modify_todo',method="post")
 def modify_todo():
 	new_todo = request.forms.get('new_todo')
 	old_todo_id = request.forms.get('old_id')
@@ -193,12 +215,12 @@ def modify_todo():
 
 
 # 修改 password 页面
-@app.route('/mpw', method='GET')
+@route('/mpw', method='GET')
 def mpw():
 	modify_passw_html = read_file("tmpl/passwd.html")
 	return modify_passw_html
 
-@app.route('/api/mpw', method='POST')
+@route('/api/mpw', method='POST')
 def api_mpw():
 	phone = request.forms.get('phonenum')
         ret_checkp = passwd_checkp(phone)
@@ -208,12 +230,12 @@ def api_mpw():
 	response.set_cookie('passwd_info', '%s'%(ret_sendsms), domain='114.67.224.92', path = '/', secret = 'asf&*45691') 
 	redirect('/mpw_change')
 	
-@app.route('/mpw_change')
+@route('/mpw_change')
 def mpw_change():
 	mpw_change_html = read_file("tmpl/passwd_change.html")
 	return mpw_change_html
 
-@app.route('/api/mpw_change', method="post")
+@route('/api/mpw_change', method="post")
 def api_mpw_change():
 	mpw_info = request.get_cookie('passwd_info', secret = 'asf&*45691')
 	sms_num = request.forms.get('sms_num')
@@ -240,19 +262,13 @@ def api_mpw_change():
 	return red_writing_1(u'密码修改成功','/todo',u'点击返回主页')
 
 
-@app.error(404)
+@error(404)
 def err(err):
 	return red_writing_1(u'页面不存在','/todo',u'点击回到todo主页')
 
-@app.error(405)
+@error(405)
 def err(err):
 	return red_writing_1(u'访问方式不正确','/todo',u'点击回到todo主页')
 
-class StripPathMiddleware(object):
-    def __init__(self, a):
-        self.a = a
-    def __call__(self, e, h):
-        e['PATH_INFO'] = e['PATH_INFO'].rstrip('/')
-        return self.a(e, h)
 if __name__ == '__main__':
-    bottle.run(host='127.0.0.1',port='10090',app=StripPathMiddleware(app),debug=True,reloader=True)
+    bottle.run(host='127.0.0.1',port='10090',debug=True,reloader=True)

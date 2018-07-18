@@ -46,6 +46,7 @@ def list_todoshow(ret_todo):
 	display_space = '&nbsp'*6
         for i in range(len(ret_todo)):
 		html_todo = ret_todo[i][1]
+                print('html_todo is', html_todo)
 		html_todoid = ret_todo[i][0]
 		html_todotime = ret_todo[i][2]
 		html_time = str(html_todotime)
@@ -63,9 +64,11 @@ def list_todoshow(ret_todo):
 	return h
 
 def update_todohtml(old_todo,todoid):
+        print('old_todo is',old_todo)
+        print(type(old_todo))
 	modify_html = '<html>'
 	modify_html =modify_html + '<form action="/api/modify_todo" method="post">'
-	modify_html =modify_html + '<font color="red">'+ u'旧todo：' + old_todo.encode('utf-8')
+	modify_html =modify_html + '<font color="red">'+ u'旧todo：' + old_todo
 	modify_html =modify_html + '<br>'+'<font color=rgb(0,0,255)>' +  u'输入新的todo:'+'<input type="text" name="new_todo" value=""/>'
 	modify_html =modify_html + '<input type="hidden", name="old_id" value="'+ str(todoid) + '"/>'
 	modify_html =modify_html + u'<input type="submit" value="修改"/>' + '</form>' + '</html>'

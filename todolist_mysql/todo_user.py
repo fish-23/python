@@ -20,6 +20,10 @@ from todo_view import *
 conn = mysql.connector.connect(user=MYUSER, password=MYPASSWORD, database=MYDATABASE)
 cursor = conn.cursor()
 
+'''
+ip表
+create table ip(id int auto_increment primary key, ipaddr varchar(20), check_time int, num int)DEFAULT CHARSET=utf8;
+'''
 # login 页面
 def login_check_n(name):
         cursor = conn.cursor(buffered=True)
@@ -74,6 +78,57 @@ def check_login(name):
                 cursor.execute(up_login, (cookie_num, name))
                 conn.commit()
                 cursor.close()
+                return -1
+
+# ip检测
+def ip_nummodify(ipaddr,db_num):
+        cursor4 = conn.cursor(buffered=True)
+        num = db_num + 1
+        update = ('update ips set  num = %s where ipaddr = %s')
+        cursor4.execute(update, (num, ipaddr))
+        conn.commit()
+        cursor4.close()
+        return 0 
+
+def ip_modify(ipaddr,time_now):
+        cursor3 = conn.cursor(buffered=True)
+        update = ('update ips set check_time = %s, num = %s where ipaddr = %s')
+        cursor3.execute(update, (time_now, 1, ipaddr))
+        conn.commit()
+        cursor3.close()
+        return 0        
+
+def ip_add(ipaddr,time_now):
+        cursor2 = conn.cursor(buffered=True)
+        insert_ip = ("insert into ips values(%s,%s,%s,%s)")
+        data = (0,ipaddr,time_now,1)
+        cursor2.execute(insert_ip, data)
+        conn.commit()
+        cursor2.close()
+        return 0
+
+def ip_check():
+        ipaddr =  request.headers.get('X-real-ip')
+        print('ip address is ', ipaddr)
+        time_now = int(time.time())
+        cursor = conn.cursor(buffered=True)
+        select_ip= ('select check_time,num from ips where ipaddr =%s')
+        cursor.execute(select_ip, (ipaddr,))
+        ret = cursor.fetchall()
+        if ret == []:
+                ip_add(ipaddr,time_now)
+                return 0
+        db_check_time = ret[0][0]
+        db_num = ret[0][1]
+        cursor.close()
+        judge_time = time_now - db_check_time
+        if judge_time > 86400:
+                ip_modify(ipaddr,time_now)
+                return 0
+        if db_num < 5:
+                ip_nummodify(ipaddr,db_num)
+                return 0
+        else:
                 return -1
 
 
@@ -248,7 +303,7 @@ def find_oldtodo(todoid):
         select_todo = ('select todo from todo where id =%s')
         cursor.execute(select_todo, (todoid,))
         ret = cursor.fetchall()
-        old_todo = ret[0]
+        old_todo = ret[0][0]
         cursor.close()
         return(old_todo)
 
