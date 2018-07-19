@@ -192,6 +192,11 @@ def lis_del(todoid):
 	name = request.get_cookie('cookie_name', secret = 'asf&*457')
 	if check_login(name) == -1:
 		return red_writing_1(u'用户尚未登录','/login',u'点击登录')
+        ret_delcheck = del_checkname(todoid, name)
+        if ret_delcheck == -1:
+                return red_writing_1(u'只能删除自己的代办事项','/list',u'点击回到个人主页')
+        if ret_delcheck == -2:
+                return red_writing_1(u'此待办事项不存在','/list',u'点击回到个人主页')
 	del_todo(todoid)
 	return redirect('/list')
 

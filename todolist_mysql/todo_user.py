@@ -300,6 +300,20 @@ def list_todoadd(todo_new,user_id):
 
 
 # todo 操作
+def del_checkname(todoid, name):
+        cursor = conn.cursor(buffered=True)
+        select_name = ('select user.name from todo,user where user.id = (select user_id from todo where todo.id = %s)')
+        cursor.execute(select_name, (todoid,))
+        ret = cursor.fetchall()
+        if ret == []:
+            return -2
+        db_name = ret[0][0]
+        conn.commit()
+        cursor.close()
+        if name == db_name :
+            return 0
+        return -1
+
 def del_todo(todoid):
         cursor = conn.cursor(buffered=True)
         del_todo =('delete from todo where id = %s')
