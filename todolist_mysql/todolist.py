@@ -29,13 +29,14 @@ def todo():
 
 @route('/test')
 def fish():
-        cursor2 = conn.cursor(buffered=True)
+        cursor2 = conn.cursor()
         select_smsnum = ('select cookie_num from user where phone =%s')
         cursor2.execute(select_smsnum, ('18392843706',))
         ret = cursor2.fetchall()
         print 'ret is', ret
         if ret == []:
                 print('用户未登陆')
+        conn.commit()
         cursor2.close()
         db_cookie_num = ret[0][0]
         cookie_num = 'qqqqqq' + ';' + '1'

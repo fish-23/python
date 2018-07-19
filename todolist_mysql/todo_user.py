@@ -30,6 +30,7 @@ def login_check_n(name):
         select_name = ('select * from user where name =%s')
         cursor.execute(select_name, (name,))
         ret = cursor.fetchall()
+        conn.commit()
         cursor.close()
 	if ret == []:
 		return -1
@@ -42,6 +43,8 @@ def login_check(name, password):
         cursor.execute(select_name, (name,))
         ret = cursor.fetchall()
         ret = ret[0][0]
+        conn.commit()
+        cursor.close()
 	if ret == password:
 		return 0
 	return -1
@@ -57,6 +60,7 @@ def check_login(name):
                 return -1
         db_cookie_num = ret[0][0]
         db_login_time = ret[0][1]
+        conn.commit()
         cursor.close()
 	cookie_num = name + ';' + '1'
         print('db_cookie_num == %s'%db_cookie_num)
@@ -120,6 +124,7 @@ def ip_check():
                 return 0
         db_check_time = ret[0][0]
         db_num = ret[0][1]
+        conn.commit()
         cursor.close()
         judge_time = time_now - db_check_time
         if judge_time > 86400:
@@ -158,6 +163,7 @@ def reg_checkphone(phone):
         else: 
             db_name = ret[0][1]       
         ret = len(ret)
+        conn.commit()
         cursor.close()
         phoneprefix = ['130','131','132','133','134','135','136','137','138','139','150','151', \
                        '152','153','156','158','159','170','183','182','181','185','186','188','189']
@@ -213,6 +219,7 @@ def reg_checkname(name):
         cursor.execute(select_name, (name,))
         ret = cursor.fetchall()        
         ret = len(ret)
+        conn.commit()
         cursor.close()               
         if ret <> 0:
 	    return -1
@@ -224,6 +231,7 @@ def reg_checksmsnum(phone,sms_num):
         ret = cursor.fetchall() 
         db_smsnum = ret[0][0]
         db_smstime = ret[0][1]
+        conn.commit()
         cursor.close()
         if sms_num.isdigit() == False:
             return -3
@@ -258,6 +266,7 @@ def list_userid(name):
         cursor.execute(select_user, (name,))
         ret_user = cursor.fetchall()
         user_id = ret_user[0][0]
+        conn.commit()
         cursor.close()
         return user_id
 
@@ -266,6 +275,7 @@ def list_todo(user_id):
         select_todo = ('select id,todo,create_time from todo where user_id =%s order by create_time asc')
         cursor.execute(select_todo, (user_id,))
         ret_todo = cursor.fetchall()
+        conn.commit()
         cursor.close()
         return ret_todo
 
@@ -277,6 +287,7 @@ def list_todoadd(todo_new,user_id):
         #在执行完下面判断后，会存入一条数据，所以十条数据，这块判断是9
         if len(ret_todoall) > 9:
             return -1
+        conn.commit()
         cursor.close()
         cursor = conn.cursor(buffered=True)
         datatime = datetime.datetime.now()
@@ -304,6 +315,7 @@ def find_oldtodo(todoid):
         cursor.execute(select_todo, (todoid,))
         ret = cursor.fetchall()
         old_todo = ret[0][0]
+        conn.commit()
         cursor.close()
         return(old_todo)
 
@@ -323,6 +335,7 @@ def passwd_checkp(phone):
         select_phone = ('select * from user where phone =%s')
         cursor.execute(select_phone, (phone,))
         ret = cursor.fetchall()
+        conn.commit()
         cursor.close()
         if ret == []:
                 return -1
