@@ -1,0 +1,13 @@
+1，项目运行后异常退出
+     直接关闭运行项目的shell会导致异常退出，应该用exit退出后关闭
+2，递归死循环会导致内存溢出
+3，字符串类型转化为字典类型 eval(str)
+4，预防短信轰炸机
+     需要取出HTTP头里面的用户ip进行判断，如果用nginx做了反向代理，需要对nginx进行配置
+     nginx配置：proxy_set_header X-Real-IP $remote_addr;
+     用户端ip：ipaddress =  request.headers.get('X-real-ip')
+5，项目中sql语句查询的数据和数据库存储的数据不一致
+     看前端传来的数据是否准确
+     写测试代码，检测查询语句是否正确
+     经测试代码测试，数据和查询语句都正确，将正确的测试代码放到bottle项目中会出错，证明bottle有问题
+     最终问题，在bottle中，查询语句执行后 ，需要提交事务
