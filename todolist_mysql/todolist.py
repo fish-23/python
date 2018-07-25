@@ -19,7 +19,7 @@ from todo_view import *
 from todo_user import *
 
 conn = mysql.connector.connect(user=MYUSER, password=MYPASSWORD, database=MYDATABASE)
-cursor = conn.cursor()
+#cursor = conn.cursor()
 
 @route('/todo')
 def todo():

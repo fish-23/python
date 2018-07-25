@@ -18,7 +18,7 @@ from config import *
 from todo_view import *
 
 conn = mysql.connector.connect(user=MYUSER, password=MYPASSWORD, database=MYDATABASE)
-cursor = conn.cursor()
+#cursor = conn.cursor()
 
 '''
 ip表
